@@ -1,4 +1,4 @@
-package br.com.gamestore.loja_api.controller; // Verifique seu pacote
+package br.com.gamestore.loja_api.controllers; // Verifique seu pacote
 
 import br.com.gamestore.loja_api.model.Jogo;
 import br.com.gamestore.loja_api.repositories.JogoRepository;

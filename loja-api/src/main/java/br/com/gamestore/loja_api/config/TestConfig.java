@@ -1,4 +1,5 @@
-package br.com.gamestore.loja_api.config; // Verifique seu pacote
+//Eu criei essa classe apenas como teste para testar a o beck end sem o front
+package br.com.gamestore.loja_api.config;
 
 import br.com.gamestore.loja_api.model.Jogo;
 import br.com.gamestore.loja_api.repositories.JogoRepository;

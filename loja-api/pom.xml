@@ -33,13 +33,18 @@
 
 
 
-
+        <!--Dependencia do spring security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-
+        <!-- Dependência para criar e validar Tokens JWT (JSON Web Tokens) -->
+        <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>java-jwt</artifactId>
+            <version>4.4.0</version>
+        </dependency>
 
 
 
