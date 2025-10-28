@@ -1,0 +1,10 @@
+Esta camada é a minha "caixa de ferramentas" para interagir com o banco de dados.
+
+Responsabilidade: Conversar diretamente com o banco (fazer o CRUD: Create, Read, Update, Delete).
+
+Exemplo: A interface JogoRepository.java herda de JpaRepository.
+
+Como funciona: Eu não preciso escrever SQL. Ao herdar do JpaRepository,
+eu ganho "magicamente" métodos como findAll(), findById(), save(), etc.
+Eu também crio métodos de busca customizados só pelo nome,
+como findByPlataformaIgnoreCase(...).

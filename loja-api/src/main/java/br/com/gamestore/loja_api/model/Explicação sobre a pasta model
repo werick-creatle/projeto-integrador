@@ -1,0 +1,9 @@
+Aqui é onde eu defino os "moldes" dos meus dados. São as classes Java
+que representam as tabelas do meu banco de dados MySQL.
+
+Responsabilidade: Mapear objetos Java para tabelas do banco de dados (usando o JPA).
+
+Exemplo: A classe Jogo.java (@Entity) é o molde para a tabela tb_jogo.
+A classe Usuario.java (@Entity) é o molde para a tabela tb_usuario.
+
+Detalhe: O UsuarioRole.java (Enum) também fica aqui, pois ele é parte do modelo do Usuario.

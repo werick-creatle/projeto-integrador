@@ -1,0 +1,9 @@
+Esta pasta guarda as classes de configuração que o Spring usa quando a aplicação inicia.
+
+Responsabilidade: Configurar e preparar o ambiente da aplicação.
+
+Exemplo 1: A TestConfig.java é usada para popular meu banco com dados de exemplo (os jogos)
+toda vez que eu inicio o projeto, o que é perfeito para testar o front-end.
+
+Exemplo 2: A SecurityConfig.java é onde eu configurei o BCryptPasswordEncoder,
+dizendo ao Spring Security como ele deve "embaralhar" (fazer hash) as senhas dos usuários.

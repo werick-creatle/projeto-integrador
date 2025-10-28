@@ -1,0 +1,9 @@
+Esta é a "porta de entrada" da minha API. É a camada que fala diretamente com o mundo exterior (o meu front-end em Angular).
+
+Responsabilidade: Definir as rotas (URLs) da API, também chamadas de "endpoints".
+
+Exemplo: O JogoController.java define rotas como GET /api/jogos e GET /api/jogos/novidades.
+
+Como funciona: Quando o Angular faz uma requisição HTTP, é o Controller quem a recebe.
+Ele então chama um Service (que ainda vamos criar) ou um Repository para fazer o trabalho
+e devolve a resposta (geralmente em JSON).
