@@ -2,11 +2,15 @@
 package br.com.gamestore.loja_api.config;
 
 import br.com.gamestore.loja_api.model.Jogo;
+import br.com.gamestore.loja_api.model.Usuario;
+import br.com.gamestore.loja_api.model.UsuarioRole;
 import br.com.gamestore.loja_api.repositories.JogoRepository;
+import br.com.gamestore.loja_api.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,6 +26,18 @@ public class TestConfig {
     // Vamos injetar o repositório, pois precisamos dele para salvar os dados
     @Autowired
     private JogoRepository jogoRepository;
+
+
+
+    //Injeções para novos teste
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
+
 
     /*
      * @Bean: Indica que o método abaixo define um "Bean" (um objeto gerenciado pelo Spring).
@@ -84,8 +100,31 @@ public class TestConfig {
             // --- Salvando a lista de jogos no banco de dados ---
             // O 'saveAll' salva todos os objetos da lista de uma vez
             jogoRepository.saveAll(Arrays.asList(jogo1, jogo2, jogo3, jogo4));
-
             System.out.println(">>> BANCO DE DADOS POPULADO COM SUCESSO! <<<");
+
+            System.out.println(">>> Verificando/Criando usuário ADMIN padrão...");
+
+            //Verificação paara saber se o adminin já existe no banco de dados
+            if (usuarioRepository.findByLogin("admin@gamestore.com") ==null) {
+
+
+                // 2. Se não existir, criptografa a senha padrão
+                // (NUNCA salve "admin123" direto no banco!
+                String senhaAdminCriptografada = passwordEncoder.encode("admin123");
+
+                Usuario admin = new Usuario(
+                        null,
+                        "admingamestore.com",
+                        senhaAdminCriptografada,
+                        UsuarioRole.ADMIN
+                );
+                //Salva o admin no banco de dados
+                usuarioRepository.save(admin);
+                System.out.println("Usuario administrador cadastrado com secesso, (Login: admin@gamestore.com, Senha: admin123) ");
+            }else {
+                System.out.println("Usuário admin (admin@gamestore.com) já existe");
+            }
+
         };
     }
 }
