@@ -6,10 +6,13 @@ import br.com.gamestore.loja_api.model.Usuario;
 import br.com.gamestore.loja_api.model.UsuarioRole;
 import br.com.gamestore.loja_api.repositories.JogoRepository;
 import br.com.gamestore.loja_api.repositories.UsuarioRepository;
+// A anotação @AllArgsConstructor não é necessária *aqui* nesta classe de config.
+// Ela é necessária nas classes Jogo.java e Usuario.java
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+// O import 'Nullable' não estava sendo usado.
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
@@ -21,9 +24,10 @@ import java.util.Arrays;
  * O Spring vai "ler" esta classe ao iniciar para encontrar definições de Beans.
  */
 @Configuration
+// A anotação @AllArgsConstructor não é necessária aqui.
 public class TestConfig {
 
-    // Vamos injetar o repositório, pois precisamos dele para salvar os dados
+    //injeta  o repositório, pois precisamos dele para salvar os dados
     @Autowired
     private JogoRepository jogoRepository;
 
@@ -47,6 +51,14 @@ public class TestConfig {
     @Bean
     public CommandLineRunner initDatabase() {
         return args -> {
+
+            // --- NOTA IMPORTANTE SOBRE ERROS DE CONSTRUÇÃO ---
+            // Se esta classe der erro a dizer "cannot be applied to given types"
+            // (não encontra o construtor), o problema NÃO É AQUI.
+            // O problema é que você se esqueceu de adicionar @AllArgsConstructor
+            // nas suas classes de MODEL (Jogo.java e Usuario.java).
+            // --- FIM DA NOTA ---
+
 
             // --- Limpa o banco de dados toda vez que a aplicação iniciar ---
             // Isso é ótimo para testes, pois começamos do zero
@@ -112,9 +124,11 @@ public class TestConfig {
                 // (NUNCA salve "admin123" direto no banco!
                 String senhaAdminCriptografada = passwordEncoder.encode("admin123");
 
+                // --- CORREÇÃO DO ERRO DE DIGITAÇÃO ---
+                // Faltava o '@' no email do admin
                 Usuario admin = new Usuario(
                         null,
-                        "admingamestore.com",
+                        "admin@gamestore.com", // CORRIGIDO
                         senhaAdminCriptografada,
                         UsuarioRole.ADMIN
                 );
@@ -128,3 +142,4 @@ public class TestConfig {
         };
     }
 }
+
