@@ -1,4 +1,4 @@
-package br.com.gamestore.loja_api.controllers; // Verifique seu pacote
+package br.com.gamestore.loja_api.controllers;
 
 import br.com.gamestore.loja_api.model.Jogo;
 import br.com.gamestore.loja_api.repositories.JogoRepository;
@@ -11,40 +11,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/*
- * @RestController: Combina @Controller e @ResponseBody.
- * Diz ao Spring que esta classe é um Controller e que os métodos
- * devem retornar JSON (ou XML, etc.) diretamente na resposta HTTP.
- */
+
+//Diz ao Spring que esta classe é um Controller e que os métodos
+//devem retornar JSON (ou XML, etc.) diretamente na resposta HTTP.
+
 @RestController
-/*
- * @RequestMapping("/api/jogos"):
- * Define um prefixo de rota para todos os métodos deste controller.
- * Qualquer endpoint aqui dentro começará com '/api/jogos'.
- */
-@RequestMapping("/api/jogos")
+@RequestMapping("/api/jogos") //Define um prefixo de rota para todos os métodos deste controller
 /*
  * @CrossOrigin("*"):
- * A ANOTAÇÃO MAIS IMPORTANTE PARA O SEU ANGULAR!
+ * A ANOTAÇÃO MAIS IMPORTANTE PARA O ANGULAR!
  * Permite que requisições de qualquer origem (como localhost:4200)
  * sejam aceitas por esta API.
  */
 @CrossOrigin("*")
 public class JogoController {
 
-    /*
-     * @Autowired: Injeção de Dependência.
-     * O Spring vai automaticamente "injetar" (fornecer) uma instância
-     * funcional do JogoRepository para nós. Não precisamos dar "new".
-     */
     @Autowired
     private JogoRepository jogoRepository;
 
     /*
-     * @GetMapping: Mapeia requisições HTTP GET.
-     * Como já temos "/api/jogos" no topo da classe, um @GetMapping
-     * sem nada (ou com "/") responde à rota GET /api/jogos.
-     * * Este é o endpoint para a sua tela "Catálogos".
+     * @GetMapping: Mapeia requisições HTTP GET. Como "/api/jogos" no topo da classe, um @GetMapping
+     * sem nada (ou com "/") responde à rota GET /api/jogos. Este é o endpoint para a sua tela "Catálogos".
      */
     @GetMapping
     public ResponseEntity<List<Jogo>> buscarTodosOsJogos() {

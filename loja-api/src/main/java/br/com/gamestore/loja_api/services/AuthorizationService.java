@@ -1,5 +1,5 @@
 /*
- * Esta classe é o serviço que o Spring Security usa
+ * Esta classe é o serviço que o Spring Security usada
  * para carregar um usuário do banco pelo login.
  */
 

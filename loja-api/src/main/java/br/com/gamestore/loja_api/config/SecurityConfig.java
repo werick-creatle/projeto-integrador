@@ -65,9 +65,8 @@ public class SecurityConfig {
                 .build();
     }
 
-//-----------------------------------------------------------------------------------------------------------------------
-@Bean
-public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
     // 1. Recebe o 'authenticationConfiguration' do Spring
     // 2. Retorna o 'getAuthenticationManager()' (o "gerente" que queremos)
     return authenticationConfiguration.getAuthenticationManager();

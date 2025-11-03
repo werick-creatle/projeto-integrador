@@ -41,30 +41,16 @@ public class TestConfig {
     private PasswordEncoder passwordEncoder;
 
 
-
-
-    /*
-     * @Bean: Indica que o método abaixo define um "Bean" (um objeto gerenciado pelo Spring).
-     * CommandLineRunner: É uma interface que garante que o método 'run()'
-     * seja executado assim que a aplicação iniciar.
-     */
     @Bean
     public CommandLineRunner initDatabase() {
         return args -> {
 
-            // --- NOTA IMPORTANTE SOBRE ERROS DE CONSTRUÇÃO ---
-            // Se esta classe der erro a dizer "cannot be applied to given types"
-            // (não encontra o construtor), o problema NÃO É AQUI.
-            // O problema é que você se esqueceu de adicionar @AllArgsConstructor
-            // nas suas classes de MODEL (Jogo.java e Usuario.java).
-            // --- FIM DA NOTA ---
 
 
-            // --- Limpa o banco de dados toda vez que a aplicação iniciar ---
-            // Isso é ótimo para testes, pois começamos do zero
+            // Limpa o banco de dados toda vez que a aplicação iniciar
             jogoRepository.deleteAll();
 
-            // --- Criando nossos jogos de exemplo ---
+
             Jogo jogo1 = new Jogo(
                     null, // ID é nulo, pois o banco vai gerar (AUTO_INCREMENT)
                     "Elden Ring",
