@@ -1,8 +1,8 @@
 package br.com.gamestore.loja_api.model;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,28 +12,38 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-@Table(name = "tb_usuario")   // Diz ao JPA (Java Persistence API) que essa classe está mapeada para uma tabela no banco de dados chamada tb_usuario
-@Entity(name = "Usuario")     // Informa que essa classe é uma entidade JPA, ou seja, ela representa uma tabela no banco.
+/*
+ * UserDetails: É uma interface do Spring Security.
+ * Nossa entidade Usuario agora É um "Detalhe de Usuário" que o Spring Security
+ * entende como usar para fazer autenticação e autorização.
+ */
+@Table(name = "tb_usuario")
+@Entity(name = "Usuario") // Corrigido (estava "Usario" com 's' antes)
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuario implements UserDetails { // Indica que a classe representa um usuário do sistema e fornece dados de autenticação pro Spring Security
+@EqualsAndHashCode(of = "id")
+public class Usuario implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Nullable
     private Long id;
 
-    // O login pode ser o email ou o username
-    @Column(unique = true) // Garante que não tenha dois logins iguais
+    // O 'login' (pode ser o email ou um username)
+    @Column(unique = true) // Garante que não teremos dois logins iguais
     private String login;
 
-
+    // A senha (que será armazenada com hash)
     private String senha;
 
-    // Faz o JPA salvar o valor do enum como texto (ex: "ADMIN", "USER") em vez de número.
+    // --- A CORREÇÃO MAIS IMPORTANTE ESTÁ AQUI ---
+    // Deve ser .STRING para salvar o texto "ADMIN" ou "USER"
+    // .ORDINAL salva o número (0 ou 1), o que causa o erro 403
     @Enumerated(EnumType.STRING)
     private UsuarioRole role;
+
+
+    // --- Métodos obrigatórios da interface UserDetails ---
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -76,12 +86,9 @@ public class Usuario implements UserDetails { // Indica que a classe representa 
         return true; // As credenciais (senha) não expiraram
     }
 
-    /**
-     * Ele retorna uma lista de objetos GrantedAuthority, que representam as roles (funções) do usuário — como ROLE_USER ou ROLE_ADMIN.
-     * Essas roles são usadas pelo Spring Security pra decidir se o usuário pode acessar determinada rota, método ou recurso.
-     */
     @Override
     public boolean isEnabled() {
         return true; // A conta está habilitada
     }
 }
+

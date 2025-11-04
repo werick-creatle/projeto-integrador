@@ -32,7 +32,6 @@
 	<dependencies>
 
 
-
         <!--Dependencia do spring security -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

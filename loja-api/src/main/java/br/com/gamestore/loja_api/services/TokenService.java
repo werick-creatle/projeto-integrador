@@ -10,6 +10,7 @@ import br.com.gamestore.loja_api.model.Usuario;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -50,14 +51,26 @@ public class TokenService {
         }
     }
 
-    /**
-     * Método privado que define a data de expiração do token.
-     * (Ex: 2 horas a partir de agora).
-     */
+
     private Instant gerarDataDeExpiracao() {
         return LocalDateTime.now()
                 .plusHours(2) // O token vai expirar em 2 horas
                 .toInstant(ZoneOffset.of("-03:00")); // Define o fuso horário (ex: Brasília)
     }
-}
 
+    public String validarToken(String token) {
+        try {
+            Algorithm algoritmo = Algorithm.HMAC256(secret);
+            return JWT.require(algoritmo)
+                    .withIssuer(issuer)
+                    .build()
+                    .verify(token) // Verifica a assinatura e a expiração
+                    .getSubject(); // Pega o "subject" (o login) de volta
+
+        } catch (JWTVerificationException exception) {
+            // Se o token for inválido (expirado, assinatura errada), retorna vazio
+            return "";
+        }
+    }
+
+}
