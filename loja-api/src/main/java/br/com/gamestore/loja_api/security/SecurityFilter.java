@@ -3,6 +3,7 @@ package br.com.gamestore.loja_api.security;
 import br.com.gamestore.loja_api.model.Usuario;
 import br.com.gamestore.loja_api.repositories.UsuarioRepository;
 import br.com.gamestore.loja_api.services.TokenService;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,25 +32,24 @@ public class SecurityFilter extends OncePerRequestFilter {
         var tokenJWT = recuperarToken(request);
 
         if (tokenJWT != null) {
-            var subject = tokenService.validarToken(tokenJWT);
+            DecodedJWT decodedJWT = tokenService.validarToken(tokenJWT); // ✅ Agora recebe DecodedJWT
 
-            if (subject != null) {
-                // ✅ CORREÇÃO: Recuperar a role do token JWT
-                var tokenDecodificado = com.auth0.jwt.JWT.decode(tokenJWT);
-                String role = tokenDecodificado.getClaim("role").asString();
+            if (decodedJWT != null) {
+                String subject = decodedJWT.getSubject();
+                String role = decodedJWT.getClaim("role").asString(); // ✅ Agora consegue ler a role
 
-                // ✅ CORREÇÃO: Buscar o usuário e fazer cast para Usuario
                 var userDetails = usuarioRepository.findByLogin(subject);
-                Usuario usuario = (Usuario) userDetails; // ← CAST EXPLÍCITO
+                if (userDetails instanceof Usuario) {
+                    Usuario usuario = (Usuario) userDetails;
 
-                // ✅ CORREÇÃO: Usar a role do token no authentication
-                var authentication = new UsernamePasswordAuthenticationToken(
-                        usuario,
-                        null,
-                        List.of(new SimpleGrantedAuthority("ROLE_" + role))
-                );
+                    var authentication = new UsernamePasswordAuthenticationToken(
+                            usuario,
+                            null,
+                            List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                    );
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
         }
 
@@ -59,7 +59,6 @@ public class SecurityFilter extends OncePerRequestFilter {
     private String recuperarToken(HttpServletRequest request) {
         var authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null) {
-            // Remove o "Bearer " do token
             return authorizationHeader.replace("Bearer ", "");
         }
         return null;
