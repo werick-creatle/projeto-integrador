@@ -1,63 +1,44 @@
-/*
- * Esta classe é a nossa "Fábrica de Tokens".
- * Ela é responsável por gerar o "crachá" (Token JWT)
- * que o usuário vai receber após o login.
- */
-
 package br.com.gamestore.loja_api.services;
 
 import br.com.gamestore.loja_api.model.Usuario;
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-
+import java.util.Date;
 
 @Service
 public class TokenService {
 
-    //Pega a "senha secreta" que definimos no application.properties
     @Value("${api.security.token.secret}")
     private String secret;
 
-    //Define quem é o "emissor" (issuer) do token
-    private String issuer = "GameStore API";
-
-    /**
-     * Método principal que GERA um novo Token JWT para um usuário.
-     */
     public String gerarToken(Usuario usuario) {
         try {
-            //Define o algoritmo de assinatura (HMAC256) usando a nossa senha secreta
-            Algorithm algoritmo = Algorithm.HMAC256(secret);
+            Date expiration = new Date(System.currentTimeMillis() + 3600000); // 1 hora
 
-            String token = JWT.create()
-                    .withIssuer(issuer) // Define quem emitiu o token
-                    .withSubject(usuario.getUsername()) // Define de quem é o token (o "assunto")
-                    .withExpiresAt(gerarDataDeExpiracao()) // Define quando o token expira
-                    // .withClaim("role", usuario.getRole().toString()) // (Opcional) Adiciona a permissão no token
-                    .sign(algoritmo); // 4. Assina o token com o algoritmo e a senha
-
-            return token;
-
+            return JWT.create()
+                    .withSubject(usuario.getLogin())
+                    .withClaim("role", usuario.getRole().name()) // ✅ Role incluída
+                    .withExpiresAt(expiration)
+                    .sign(Algorithm.HMAC256(secret));
         } catch (JWTCreationException exception) {
-            throw new RuntimeException("Erro ao gerar o Token JWT", exception);
+            throw new RuntimeException("Erro ao gerar token JWT", exception);
         }
     }
 
-    /**
-     * Método privado que define a data de expiração do token.
-     * (Ex: 2 horas a partir de agora).
-     */
-    private Instant gerarDataDeExpiracao() {
-        return LocalDateTime.now()
-                .plusHours(2) // O token vai expirar em 2 horas
-                .toInstant(ZoneOffset.of("-03:00")); // Define o fuso horário (ex: Brasília)
+    public DecodedJWT validarToken(String token) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            JWTVerifier verifier = JWT.require(algorithm).build();
+            return verifier.verify(token); // ✅ Retorna token completo para ler claims
+        } catch (JWTVerificationException exception) {
+            return null;
+        }
     }
 }
-

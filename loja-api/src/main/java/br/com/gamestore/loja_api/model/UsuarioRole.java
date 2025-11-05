@@ -6,8 +6,8 @@
 package br.com.gamestore.loja_api.model;
 
 public enum UsuarioRole {
-    ADMIN("admin"),
-    USER("user");
+    ADMIN("ADMIN"),
+    USER("USER");
 
     private String role;
 

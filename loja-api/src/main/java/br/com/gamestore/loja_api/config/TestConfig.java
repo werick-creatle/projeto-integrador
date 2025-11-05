@@ -1,4 +1,5 @@
-//Eu criei essa classe apenas como teste para testar a o beck end sem o front
+// Eu criei essa classe apenas como teste para testar o back-end sem o front.
+
 package br.com.gamestore.loja_api.config;
 
 import br.com.gamestore.loja_api.model.Jogo;
@@ -6,13 +7,11 @@ import br.com.gamestore.loja_api.model.Usuario;
 import br.com.gamestore.loja_api.model.UsuarioRole;
 import br.com.gamestore.loja_api.repositories.JogoRepository;
 import br.com.gamestore.loja_api.repositories.UsuarioRepository;
-// A anotação @AllArgsConstructor não é necessária *aqui* nesta classe de config.
-// Ela é necessária nas classes Jogo.java e Usuario.java
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-// O import 'Nullable' não estava sendo usado.
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
@@ -24,32 +23,27 @@ import java.util.Arrays;
  * O Spring vai "ler" esta classe ao iniciar para encontrar definições de Beans.
  */
 @Configuration
-// A anotação @AllArgsConstructor não é necessária aqui.
 public class TestConfig {
 
-    //injeta  o repositório, pois precisamos dele para salvar os dados
+    // Injeta o repositório, pois precisamos dele para salvar os dados
     @Autowired
     private JogoRepository jogoRepository;
 
-
-
-    //Injeções para novos teste
+    // Injeções para novos testes
     @Autowired
     private UsuarioRepository usuarioRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
     @Bean
     public CommandLineRunner initDatabase() {
         return args -> {
 
-
+            usuarioRepository.deleteAll(); // ← LIMPA OS USUÁRIOS TAMBÉM!
 
             // Limpa o banco de dados toda vez que a aplicação iniciar
             jogoRepository.deleteAll();
-
 
             Jogo jogo1 = new Jogo(
                     null, // ID é nulo, pois o banco vai gerar (AUTO_INCREMENT)
@@ -102,30 +96,29 @@ public class TestConfig {
 
             System.out.println(">>> Verificando/Criando usuário ADMIN padrão...");
 
-            //Verificação paara saber se o adminin já existe no banco de dados
-            if (usuarioRepository.findByLogin("admin@gamestore.com") ==null) {
-
+            // Verificação para saber se o admin já existe no banco de dados
+            if (usuarioRepository.findByLogin("admin@gamestore.com") == null) {
 
                 // 2. Se não existir, criptografa a senha padrão
-                // (NUNCA salve "admin123" direto no banco!
+                // (NUNCA salve "admin123" direto no banco!)
                 String senhaAdminCriptografada = passwordEncoder.encode("admin123");
 
-                // --- CORREÇÃO DO ERRO DE DIGITAÇÃO ---
+                // --- Correção do erro de digitação ---
                 // Faltava o '@' no email do admin
                 Usuario admin = new Usuario(
                         null,
-                        "admin@gamestore.com", // CORRIGIDO
+                        "admin@gamestore.com",
                         senhaAdminCriptografada,
                         UsuarioRole.ADMIN
                 );
-                //Salva o admin no banco de dados
+
+                // Salva o admin no banco de dados
                 usuarioRepository.save(admin);
-                System.out.println("Usuario administrador cadastrado com secesso, (Login: admin@gamestore.com, Senha: admin123) ");
-            }else {
+                System.out.println("Usuário administrador cadastrado com sucesso (Login: admin@gamestore.com, Senha: admin123)");
+
+            } else {
                 System.out.println("Usuário admin (admin@gamestore.com) já existe");
             }
-
         };
     }
 }
-
