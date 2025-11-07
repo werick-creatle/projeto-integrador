@@ -8,5 +8,7 @@ public record JogoCadastroDTO(
         String urlImagemCapa,
         BigDecimal preco,
         String plataforma,
-        LocalDate dataLancamento
+        LocalDate dataLancamento,
+        String descricao,
+        String genero
 ) {}
