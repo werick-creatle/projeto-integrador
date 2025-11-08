@@ -5,7 +5,6 @@ import br.com.gamestore.loja_api.model.Usuario;
 import br.com.gamestore.loja_api.model.UsuarioRole;
 import br.com.gamestore.loja_api.repositories.JogoRepository;
 import br.com.gamestore.loja_api.repositories.UsuarioRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -14,14 +13,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList; // Importe ArrayList
 import java.util.Arrays;
+import java.util.List; // Importe List
 
+/*
+ * @Configuration: Diz ao Spring que esta é uma classe de configuração.
+ * O Spring vai "ler" esta classe ao iniciar para encontrar definições de Beans.
+ */
 @Configuration
 public class TestConfig {
 
+    // Injeta o repositório, pois precisamos dele para salvar os dados
     @Autowired
     private JogoRepository jogoRepository;
 
+    // Injeções para novos testes
     @Autowired
     private UsuarioRepository usuarioRepository;
 
@@ -36,76 +43,82 @@ public class TestConfig {
             //jogoRepository.deleteAll();
 
             Jogo jogo1 = new Jogo(
-                    null, // ID é nulo, pois o banco vai gerar (AUTO_INCREMENT)
-                    "Elden Ring",
-                    "Jogo de RPG de ação aclamado pela crítica.",
-                    new BigDecimal("199.90"),
-                    "PS4",
-                    "RPG",
-                    "https://caminho-da-sua-imagem.com/elden-ring.png",
+                    null, "Elden Ring", "Jogo de RPG de ação aclamado pela crítica.",
+                    new BigDecimal("199.90"), "PS4", "RPG",
+                    "httpsa://caminho-da-sua-imagem.com/elden-ring.png",
                     LocalDate.parse("2022-02-25")
             );
 
             Jogo jogo2 = new Jogo(
-                    null,
-                    "FIFA 23",
-                    "Jogo de simulação de futebol.",
-                    new BigDecimal("249.90"),
-                    "XBOX",
-                    "Esporte",
-                    "https://caminho-da-sua-imagem.com/fifa-23.png",
+                    null, "FIFA 23", "Jogo de simulação de futebol.",
+                    new BigDecimal("249.90"), "XBOX", "Esporte",
+                    "httpsa://caminho-da-sua-imagem.com/fifa-23.png",
                     LocalDate.parse("2022-09-27")
             );
 
             Jogo jogo3 = new Jogo(
-                    null,
-                    "God of War Ragnarok",
-                    "Aventura épica de Kratos e Atreus.",
-                    new BigDecimal("299.90"),
-                    "PS4",
-                    "Ação",
-                    "https://caminho-da-sua-imagem.com/gow-ragnarok.png",
+                    null, "God of War Ragnarok", "Aventura épica de Kratos e Atreus.",
+                    new BigDecimal("299.90"), "PS4", "Ação",
+                    "httpsa://caminho-da-sua-imagem.com/gow-ragnarok.png",
                     LocalDate.parse("2022-11-09")
             );
 
             Jogo jogo4 = new Jogo(
-                    null,
-                    "Forza Horizon 5",
-                    "Jogo de corrida em mundo aberto no México.",
-                    new BigDecimal("249.90"),
-                    "XBOX",
-                    "Corrida",
-                    "https://caminho-da-sua-imagem.com/forza-5.png",
+                    null, "Forza Horizon 5", "Jogo de corrida em mundo aberto no México.",
+                    new BigDecimal("249.90"), "XBOX", "Corrida",
+                    "httpsa://caminho-da-sua-imagem.com/forza-5.png",
                     LocalDate.parse("2021-11-05")
             );
 
-            // --- Salvando a lista de jogos no banco de dados ---
-            // O 'saveAll' salva todos os objetos da lista de uma vez
-            jogoRepository.saveAll(Arrays.asList(jogo1, jogo2, jogo3, jogo4));
-            System.out.println(">>> BANCO DE DADOS POPULADO COM SUCESSO! <<<");
+            // --- NOVOS 20 JOGOS ---
+            List<Jogo> novosJogos = Arrays.asList(
+                    new Jogo(null, "Hogwarts Legacy", "Explore o mundo mágico de Harry Potter.", new BigDecimal("299.90"), "PS5", "RPG", "img/hogwarts.png", LocalDate.parse("2023-02-10")),
+                    new Jogo(null, "Diablo IV", "Retorno sombrio da franquia de RPG de ação.", new BigDecimal("349.90"), "PC", "RPG", "img/diablo4.png", LocalDate.parse("2023-06-05")),
+                    new Jogo(null, "Starfield", "Aventura de RPG espacial da Bethesda.", new BigDecimal("349.90"), "XBOX", "RPG", "img/starfield.png", LocalDate.parse("2023-09-06")),
+                    new Jogo(null, "Marvel's Spider-Man 2", "Peter Parker e Miles Morales retornam.", new BigDecimal("349.90"), "PS5", "Ação", "img/spiderman2.png", LocalDate.parse("2023-10-20")),
+                    new Jogo(null, "Baldur's Gate 3", "RPG clássico baseado em Dungeons & Dragons.", new BigDecimal("199.90"), "PC", "RPG", "img/bg3.png", LocalDate.parse("2023-08-03")),
+                    new Jogo(null, "Cyberpunk 2077", "RPG de ação em Night City.", new BigDecimal("159.90"), "PC", "RPG", "img/cyberpunk.png", LocalDate.parse("2020-12-10")),
+                    new Jogo(null, "The Legend of Zelda: Tears of the Kingdom", "Aventura no reino de Hyrule.", new BigDecimal("349.90"), "Switch", "Aventura", "img/zelda_totk.png", LocalDate.parse("2023-05-12")),
+                    new Jogo(null, "Red Dead Redemption 2", "Épico de faroeste da Rockstar.", new BigDecimal("199.90"), "PS4", "Ação", "img/rdr2.png", LocalDate.parse("2018-10-26")),
+                    new Jogo(null, "The Witcher 3: Wild Hunt", "RPG de mundo aberto de Geralt de Rivia.", new BigDecimal("129.90"), "PC", "RPG", "img/witcher3.png", LocalDate.parse("2015-05-19")),
+                    new Jogo(null, "Hades", "Roguelike de mitologia grega.", new BigDecimal("89.90"), "Switch", "Roguelike", "img/hades.png", LocalDate.parse("2020-09-17")),
+                    new Jogo(null, "Resident Evil 4 (Remake)", "Remake do clássico de terror.", new BigDecimal("249.90"), "PS5", "Terror", "img/re4.png", LocalDate.parse("2023-03-24")),
+                    new Jogo(null, "Street Fighter 6", "Novo capítulo da lendária série de luta.", new BigDecimal("299.90"), "PS5", "Luta", "img/sf6.png", LocalDate.parse("2023-06-02")),
+                    new Jogo(null, "Mortal Kombat 1", "Reboot da franquia de luta.", new BigDecimal("319.90"), "XBOX", "Luta", "img/mk1.png", LocalDate.parse("2023-09-19")),
+                    new Jogo(null, "Alan Wake 2", "Sequência do aclamado terror psicológico.", new BigDecimal("279.90"), "PC", "Terror", "img/alanwake2.png", LocalDate.parse("2023-10-27")),
+                    new Jogo(null, "Lies of P", "RPG de ação 'souls-like' do Pinóquio.", new BigDecimal("249.90"), "PC", "RPG", "img/liesofp.png", LocalDate.parse("2023-09-18")),
+                    new Jogo(null, "Final Fantasy XVI", "Novo épico de RPG da Square Enix.", new BigDecimal("349.90"), "PS5", "RPG", "img/ff16.png", LocalDate.parse("2023-06-22")),
+                    new Jogo(null, "Sea of Stars", "RPG indie inspirado nos clássicos.", new BigDecimal("129.90"), "Switch", "RPG", "img/seaofstars.png", LocalDate.parse("2023-08-29")),
+                    new Jogo(null, "Armored Core VI", "Ação com mechas da FromSoftware.", new BigDecimal("299.90"), "XBOX", "Ação", "img/ac6.png", LocalDate.parse("2023-08-25")),
+                    new Jogo(null, "Star Wars Jedi: Survivor", "Continuação da jornada de Cal Kestis.", new BigDecimal("319.90"), "PS5", "Ação", "img/jedi_survivor.png", LocalDate.parse("2023-04-28")),
+                    new Jogo(null, "Assassin's Creed Mirage", "Retorno às raízes da franquia.", new BigDecimal("239.90"), "XBOX", "Ação", "img/ac_mirage.png", LocalDate.parse("2023-10-05"))
+            );
 
+            // --- SALVANDO TODOS OS 24 JOGOS ---
+
+            // 1. Cria uma lista final juntando os 4 originais
+            List<Jogo> todosOsJogos = new ArrayList<>(Arrays.asList(jogo1, jogo2, jogo3, jogo4));
+
+            // 2. Adiciona os 20 novos na lista final
+            todosOsJogos.addAll(novosJogos);
+
+            // 3. Salva todos os 24 jogos no banco de uma vez
+            jogoRepository.saveAll(todosOsJogos);
+            System.out.println(">>> BANCO DE DADOS POPULADO COM 24 JOGOS! <<<");
+
+
+            // --- CRIAÇÃO DO USUÁRIO ADMIN (Continua igual) ---
             System.out.println(">>> Verificando/Criando usuário ADMIN padrão...");
-
-            // Verificação para saber se o admin já existe no banco de dados
             if (usuarioRepository.findByLogin("admin@gamestore.com") == null) {
-
-                // 2. Se não existir, criptografa a senha padrão
-                // (NUNCA salve "admin123" direto no banco!)
                 String senhaAdminCriptografada = passwordEncoder.encode("admin123");
-
-                // --- Correção do erro de digitação ---
-                // Faltava o '@' no email do admin
                 Usuario admin = new Usuario(
                         null,
                         "admin@gamestore.com",
                         senhaAdminCriptografada,
                         UsuarioRole.ADMIN
                 );
-
-                // Salva o admin no banco de dados
                 usuarioRepository.save(admin);
                 System.out.println("Usuário administrador cadastrado com sucesso (Login: admin@gamestore.com, Senha: admin123)");
-
             } else {
                 System.out.println("Usuário admin (admin@gamestore.com) já existe");
             }

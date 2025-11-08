@@ -111,4 +111,12 @@ public class JogoController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/novidades")
+    public ResponseEntity<List<Jogo>> buscarnovidades(){
+        List<Jogo> novidades = jogoRepository.findTop4ByOrderByDataLancamentoDesc();
+
+        return ResponseEntity.ok(novidades);
+
+    }
+
 }
