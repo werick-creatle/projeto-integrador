@@ -98,4 +98,17 @@ public class JogoController {
         return ResponseEntity.ok(jogoAtualizado);
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Jogo> deletarjogo(@PathVariable Long id){
+        Optional<Jogo> optionalJogo = jogoRepository.findById(id);
+
+        if (optionalJogo.isEmpty()){
+            return  ResponseEntity.notFound().build();
+        }
+
+        jogoRepository.deleteById(id);//Apaga o jogo
+
+        return ResponseEntity.noContent().build();
+    }
+
 }
