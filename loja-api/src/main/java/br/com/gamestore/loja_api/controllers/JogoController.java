@@ -119,4 +119,12 @@ public class JogoController {
 
     }
 
-}
+
+    @GetMapping("/plataforma/{plataforma}")
+    public ResponseEntity<List<Jogo>> buscarPorPlataforma(@PathVariable String plataforma){
+
+        List<Jogo> jogosPorPlataforma = jogoRepository.findByPlataformaIgnoreCase(plataforma);
+
+        return ResponseEntity.ok(jogosPorPlataforma);
+    }
+ }
