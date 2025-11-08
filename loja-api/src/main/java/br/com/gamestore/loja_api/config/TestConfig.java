@@ -1,5 +1,3 @@
-// Eu criei essa classe apenas como teste para testar o back-end sem o front.
-
 package br.com.gamestore.loja_api.config;
 
 import br.com.gamestore.loja_api.model.Jogo;
@@ -18,18 +16,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 
-/*
- * @Configuration: Diz ao Spring que esta é uma classe de configuração.
- * O Spring vai "ler" esta classe ao iniciar para encontrar definições de Beans.
- */
 @Configuration
 public class TestConfig {
 
-    // Injeta o repositório, pois precisamos dele para salvar os dados
     @Autowired
     private JogoRepository jogoRepository;
 
-    // Injeções para novos testes
     @Autowired
     private UsuarioRepository usuarioRepository;
 
@@ -40,10 +32,8 @@ public class TestConfig {
     public CommandLineRunner initDatabase() {
         return args -> {
 
-            usuarioRepository.deleteAll(); // ← LIMPA OS USUÁRIOS TAMBÉM!
-
-            // Limpa o banco de dados toda vez que a aplicação iniciar
-            jogoRepository.deleteAll();
+            //usuarioRepository.deleteAll();
+            //jogoRepository.deleteAll();
 
             Jogo jogo1 = new Jogo(
                     null, // ID é nulo, pois o banco vai gerar (AUTO_INCREMENT)

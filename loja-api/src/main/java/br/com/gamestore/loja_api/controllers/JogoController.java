@@ -2,7 +2,9 @@ package br.com.gamestore.loja_api.controllers;
 
 
 import org.springframework.web.bind.annotation.PathVariable;
+
 import java.util.Optional;
+
 import br.com.gamestore.loja_api.dto.JogoCadastroDTO;
 import org.springframework.http.HttpStatus;
 import br.com.gamestore.loja_api.model.Jogo;
@@ -24,32 +26,10 @@ public class JogoController {
     private JogoRepository jogoRepository;
 
 
-    @GetMapping("/{id}")
-    ResponseEntity<Jogo> buscarJogoPorId(@PathVariable Long id){
-        Optional<Jogo> optionalJogo = jogoRepository.findById(id);
 
-        //Verificação para saber se o jogo foi encontrado
-        if (optionalJogo.isPresent()){
-            Jogo jogoEncontrado = optionalJogo.get(); // se achar o jogo retorna o jogo
-            return ResponseEntity.ok(jogoEncontrado);
-        }else {
-            return ResponseEntity.notFound().build();//Se não achar retorna o status da requisição
-        }
-    }
-
-
-    @GetMapping
-    public ResponseEntity<List<Jogo>> buscarTodosOsJogos() {
-        // 1. Usa o repositório (injetado) para buscar TODOS os jogos no banco.
-        List<Jogo> listaDeJogos = jogoRepository.findAll();
-
-        // 2. Retorna uma resposta HTTP 200 (OK) com a lista de jogos no corpo (body).
-        // O Spring automaticamente converte a 'listaDeJogos' (Java) para JSON.
-        return ResponseEntity.ok(listaDeJogos);
-    }
     @PostMapping
-    public ResponseEntity<?> cadastrarNovoJogo(@RequestBody JogoCadastroDTO dados){
-        if(jogoRepository.existsByNomeIgnoreCase(dados.nome())){
+    public ResponseEntity<?> cadastrarNovoJogo(@RequestBody JogoCadastroDTO dados) {
+        if (jogoRepository.existsByNomeIgnoreCase(dados.nome())) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body("Erro: Já existe um jogo cadastrado com esse nome.");
@@ -68,6 +48,54 @@ public class JogoController {
         jogoRepository.save(jogoNovo);//Aqui o metodo esta salvando o jogo no banco
 
         return ResponseEntity.status(HttpStatus.CREATED).body(jogoNovo);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Jogo>> buscarTodosOsJogos() {
+        List<Jogo> listaDeJogos = jogoRepository.findAll();
+
+
+        return ResponseEntity.ok(listaDeJogos);
+    }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Jogo> buscarJogoPorId(@PathVariable Long id) {
+        Optional<Jogo> optionalJogo = jogoRepository.findById(id);
+
+        //Verificação para saber se o jogo foi encontrado
+        if (optionalJogo.isPresent()) {
+            Jogo jogoEncontrado = optionalJogo.get(); // se achar o jogo retorna o jogo
+            return ResponseEntity.ok(jogoEncontrado);
+        } else {
+            return ResponseEntity.notFound().build();//Se não achar retorna o status da requisição
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Jogo> atualizarJogo(@PathVariable Long id, @RequestBody JogoCadastroDTO dados ){
+
+        //Tento encontrar o jogo a ser atualizado
+        Optional<Jogo> optionalJogo = jogoRepository.findById(id);
+
+        if (optionalJogo.isEmpty()){
+            return ResponseEntity.notFound().build();
+        }
+
+        Jogo jogoExistente = optionalJogo.get();
+
+        //Atualiza o campo jogo se o jogo existir
+        jogoExistente.setNome(dados.nome());
+        jogoExistente.setDescricao(dados.descricao());
+        jogoExistente.setPreco(dados.preco());
+        jogoExistente.setPlataforma(dados.plataforma());
+        jogoExistente.setGenero(dados.genero());
+        jogoExistente.setUrlImagemCapa(dados.urlImagemCapa());
+        jogoExistente.setDataLancamento(dados.dataLancamento());
+
+        Jogo jogoAtualizado = jogoRepository.save(jogoExistente); // Salva as alterações
+
+        return ResponseEntity.ok(jogoAtualizado);
     }
 
 }

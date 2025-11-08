@@ -31,24 +31,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    /*
-     * Esse método `securityFilterChain` é basicamente o "segurança" da API.
-     * É aqui que eu defini quem pode acessar O QUÊ.
-     *
-     * O que eu fiz aqui:
-     * 1. Desliguei o 'csrf()' e mandei o Spring não criar 'Sessão' (STATELESS),
-     *    porque eu estou fazendo uma API REST moderna (que vai usar Tokens,
-     *    não sessão de navegador).
-     *
-     * 2. Eu liberei (permitAll) as rotas PÚBLICAS:
-     *    - POST /auth/register -> Para qualquer um poder se CADASTRAR.
-     *    - GET /api/jogos/** -> Para qualquer um poder VER os jogos
-     *      (o catálogo, novidades, etc.).
-     *
-     * 3. Eu tranquei (authenticated) TODO O RESTO (anyRequest):
-     *    - Isso significa que para cadastrar um jogo novo, deletar, etc.,
-     *      o usuário vai precisar estar LOGADO.
-     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -59,6 +41,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/login/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/jogos/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/jogos").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/jogos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/jogos/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
@@ -68,8 +53,6 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        // 1. Recebe o 'authenticationConfiguration' do Spring
-        // 2. Retorna o 'getAuthenticationManager()' (o "gerente" que queremos)
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
