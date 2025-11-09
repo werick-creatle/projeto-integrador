@@ -32,11 +32,11 @@ public class SecurityFilter extends OncePerRequestFilter {
         var tokenJWT = recuperarToken(request);
 
         if (tokenJWT != null) {
-            DecodedJWT decodedJWT = tokenService.validarToken(tokenJWT); // ✅ Agora recebe DecodedJWT
+            DecodedJWT decodedJWT = tokenService.validarToken(tokenJWT);
 
             if (decodedJWT != null) {
                 String subject = decodedJWT.getSubject();
-                String role = decodedJWT.getClaim("role").asString(); // ✅ Agora consegue ler a role
+                String role = decodedJWT.getClaim("role").asString();
 
                 var userDetails = usuarioRepository.findByLogin(subject);
                 if (userDetails instanceof Usuario) {

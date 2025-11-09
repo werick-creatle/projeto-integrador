@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import br.com.gamestore.loja_api.dto.LoginDTO;
 import br.com.gamestore.loja_api.dto.RegistroDTO;
 import br.com.gamestore.loja_api.dto.TokenDTO;
+import br.com.gamestore.loja_api.model.Carrinho;
 import br.com.gamestore.loja_api.model.Usuario;
 import br.com.gamestore.loja_api.model.UsuarioRole;
 import br.com.gamestore.loja_api.repositories.UsuarioRepository;
@@ -17,14 +18,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.AuthenticationException;
 
 @RestController
 @RequestMapping("/login") // Todas as rotas aqui começarão com /login
+@CrossOrigin("*")
 public class AuthController {
 
     @Autowired
@@ -64,8 +63,14 @@ public class AuthController {
                 senhaCriptografada,
                 UsuarioRole.USER,
                 dados.nomeCompleto(),
-                dados.dataNascimento()
+                dados.dataNascimento(),
+                null
         );
+
+        //aqui estou criando um novo carrinho e pasando o novoUsuario para ele
+        Carrinho novoCarrinho = new Carrinho(novoUsuario);
+
+        novoUsuario.setCarrinho(novoCarrinho);
 
         // Salvar o novo usuário no banco de dados
         this.usuarioRepository.save(novoUsuario);

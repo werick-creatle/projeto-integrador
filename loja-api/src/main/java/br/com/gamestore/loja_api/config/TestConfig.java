@@ -1,10 +1,13 @@
 package br.com.gamestore.loja_api.config;
 
+import br.com.gamestore.loja_api.model.Carrinho;
 import br.com.gamestore.loja_api.model.Jogo;
 import br.com.gamestore.loja_api.model.Usuario;
 import br.com.gamestore.loja_api.model.UsuarioRole;
 import br.com.gamestore.loja_api.repositories.JogoRepository;
 import br.com.gamestore.loja_api.repositories.UsuarioRepository;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +19,9 @@ import java.time.LocalDate; // Import já está aqui, ótimo
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+@Getter
+@Setter
 
 @Configuration
 public class TestConfig {
@@ -104,7 +110,6 @@ public class TestConfig {
             } else {
                 System.out.println(">>> BANCO DE JOGOS JÁ POSSUI DADOS. <<<");
             }
-            // --- FIM DA SEÇÃO DOS JOGOS ---
 
 
             // --- CRIAÇÃO DO USUÁRIO ADMIN (ESSA É A PARTE CORRIGIDA) ---
@@ -112,16 +117,19 @@ public class TestConfig {
             if (usuarioRepository.findByLogin("admin@gamestore.com") == null) {
                 String senhaAdminCriptografada = passwordEncoder.encode("admin1G23"); // Mudei a senha para "admin1G23"
 
-                // --- A CORREÇÃO ESTÁ AQUI ---
+
                 Usuario admin = new Usuario(
                         null,
                         "admin@gamestore.com",
                         senhaAdminCriptografada,
                         UsuarioRole.ADMIN,
-                        "Administrador da Loja", // <-- CAMPO NOVO (nomeCompleto)
-                        LocalDate.parse("2000-01-01")  // <-- CAMPO NOVO (dataNascimento)
+                        "Administrador da Loja",
+                        LocalDate.parse("2000-01-01"),
+                        null
                 );
-                // --- FIM DA CORREÇÃO ---
+                Carrinho carrinhoAdmin = new Carrinho(admin);
+                admin.setCarrinho(carrinhoAdmin);
+
 
                 usuarioRepository.save(admin);
                 System.out.println("Usuário administrador cadastrado com sucesso (Login: admin@gamestore.com, Senha: admin1G23)");
