@@ -9,7 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import jakarta.validation.Valid;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -24,13 +25,13 @@ public class JogoController {
 
     // 1. Buscar Todos
     @GetMapping
-    public ResponseEntity<List<Jogo>> buscarTodosOsJogos() {
+    public ResponseEntity<Page<Jogo>> buscarTodosOsJogos(Pageable pageable) {
         // O controller só chama o service e retorna OK
-        List<Jogo> listaDeJogos = jogoService.listarTodos();
-        return ResponseEntity.ok(listaDeJogos);
+        Page<Jogo> paginaDeJogos = jogoService.listarTodos(pageable);
+        return ResponseEntity.ok(paginaDeJogos);
     }
 
-    // 2. Buscar por ID
+    // 2. Buscar por ID.
     @GetMapping("/{id}")
     public ResponseEntity<Jogo> buscarJogoPorId(@PathVariable Long id) {
         try {
@@ -58,7 +59,7 @@ public class JogoController {
 
     // 4. Atualizar
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizarJogo(@PathVariable Long id,@Valid @RequestBody JogoCadastroDTO dados) {
+    public ResponseEntity<?> atualizarJogo(@PathVariable Long id, @Valid @RequestBody JogoCadastroDTO dados) {
         try {
             Jogo jogoAtualizado = jogoService.atualizarJogo(id, dados);
             return ResponseEntity.ok(jogoAtualizado);
