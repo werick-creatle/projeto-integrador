@@ -1,5 +1,6 @@
 package br.com.gamestore.loja_api.services;
 
+import br.com.gamestore.loja_api.dto.ItemAtualizarDTO;
 import br.com.gamestore.loja_api.dto.ItemCarrinhoViewDTO;
 import br.com.gamestore.loja_api.dto.CarrinhoViewDTO;
 
@@ -62,7 +63,6 @@ public class CarrinhoService {
     }
 
 
-
     public void adicionarAoCarrinho(ItemAdicionarDTO dados, Usuario usuario) {
         Carrinho carrinho = usuario.getCarrinho();
 
@@ -107,7 +107,6 @@ public class CarrinhoService {
                 .collect(Collectors.toList());
 
 
-
         // Aqui eu calculo o total do carrinho somando o subtotal de cada item
         // O 'reduce' começa com ZERO e vai somando o valor de cada item
         BigDecimal total = itensDTO.stream()
@@ -116,5 +115,31 @@ public class CarrinhoService {
 
         // Por fim, retorno um novo objeto CarrinhoViewDTO contendo a lista de itens e o valor total do carrinho
         return new CarrinhoViewDTO(itensDTO, total);
+    }
+
+
+    public void atualizarQuantidadeItem(Long itemId, ItemAtualizarDTO dados, Usuario usuario) {
+        Carrinho carrinho = usuario.getCarrinho();
+
+        //Aqui estou buscando o item pelo Id
+        Optional<ItemDoCarrinho> optionalItem = itemDoCarrinhoRepository.findById(itemId);
+
+
+        ItemDoCarrinho itemParaAtualizar;
+
+        if (optionalItem.isPresent()) {
+
+            //Aqui estou atualizando o item
+            itemParaAtualizar = optionalItem.get();
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item não encontrado");
+        }
+        //Essa verificação garante q o itemId q eu vou alualizar pertence ao carrinho do usuario
+        if (!itemParaAtualizar.getCarrinho().getId().equals(carrinho.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para alterar esse item");
+        }
+        //Aqui estou atualizando os itens do repositorio do carrinho
+        itemParaAtualizar.setQuantidade(dados.quantidade());
+        itemDoCarrinhoRepository.save(itemParaAtualizar);
     }
 }

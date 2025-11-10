@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
+import br.com.gamestore.loja_api.dto.ItemAtualizarDTO;
 
 
 @RestController
@@ -20,6 +21,20 @@ public class CarrinhoController {
 
     @Autowired
     CarrinhoService carrinhoService;
+
+    @PutMapping("/atualizar/{itemId}")
+    public ResponseEntity<?> atualizarQuantidade(@PathVariable Long itemId, @Valid @RequestBody ItemAtualizarDTO dados, Authentication authentication){ //Essa anotação @PathVariable pega um valor q veio dentro de uma URL e joga dentro do metodo como uma variavel
+        try {
+            Usuario usuarioLogado = (Usuario) authentication.getPrincipal();
+            carrinhoService.atualizarQuantidadeItem(itemId,dados ,usuarioLogado);
+
+            return ResponseEntity.ok().build();
+        }catch (ResponseStatusException e){
+            return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
+        }
+    }
+
+
 
 
     @DeleteMapping("/remover/{itemId}")
