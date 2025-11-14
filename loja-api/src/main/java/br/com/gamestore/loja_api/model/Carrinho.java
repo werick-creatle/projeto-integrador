@@ -3,7 +3,6 @@ package br.com.gamestore.loja_api.model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.Set;
-
 import java.util.HashSet;
 
 @Entity
@@ -11,7 +10,7 @@ import java.util.HashSet;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(exclude = {"usuario", "itens"})
 public class Carrinho {
 
     @Id
@@ -21,10 +20,10 @@ public class Carrinho {
     @OneToOne(mappedBy = "carrinho")
     private Usuario usuario;
 
-    @OneToMany(mappedBy = "carrinho", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "carrinho", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<ItemDoCarrinho> itens = new HashSet<>();
 
-    public Carrinho(Usuario usuario){
+    public Carrinho(Usuario usuario) {
         this.usuario = usuario;
     }
 }

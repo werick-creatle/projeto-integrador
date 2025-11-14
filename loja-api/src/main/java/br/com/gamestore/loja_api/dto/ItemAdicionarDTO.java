@@ -12,5 +12,6 @@ public record ItemAdicionarDTO(
 
         @Min(value = 1, message = "A quantidade deve ser pelo menos 1.")
         int quantidade
-) {}
+) {
+}
 

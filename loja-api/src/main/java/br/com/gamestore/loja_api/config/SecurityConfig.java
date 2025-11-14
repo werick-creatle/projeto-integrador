@@ -18,8 +18,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import java.util.Arrays;
 
+import java.util.Arrays;
 
 
 @Configuration
@@ -48,13 +48,14 @@ public class SecurityConfig {
 
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/login/register").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/login/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/jogos/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/jogos").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/jogos/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/jogos/**").hasRole("ADMIN")
                         .requestMatchers("/api/carrinho/**").hasRole("USER")
+                        .requestMatchers("/api/pedidos/**").hasRole("USER")
 
                         .anyRequest().authenticated()
                 )

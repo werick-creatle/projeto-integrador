@@ -1,0 +1,28 @@
+CLIENTE (Front-end / Postman / Insomnia)
+          │
+          ▼
+┌────────────────────────────┐
+│       Controller Layer     │  → recebe requisições HTTP
+│ (AuthController, JogoController, etc.)
+└────────────────────────────┘
+          │
+          ▼
+┌────────────────────────────┐
+│        Service Layer       │  → aplica regras de negócio
+│ (JogoService, CarrinhoService, etc.)
+└────────────────────────────┘
+          │
+          ▼
+┌────────────────────────────┐
+│      Repository Layer      │  → acessa o banco de dados
+│ (JogoRepository, UsuarioRepository, etc.)
+└────────────────────────────┘
+          │
+          ▼
+┌────────────────────────────┐
+│         Model Layer        │  → representa tabelas do banco
+│ (Usuario, Jogo, Pedido, etc.)
+└────────────────────────────┘
+Esta é a pasta raiz do meu código-fonte. Aqui dentro fica a classe principal
+LojaApiApplication.java, que é o "coração" do projeto. É ela que tem o método main
+e a anotação @SpringBootApplication que faz tudo funcionar e "liga" o servidor.

@@ -1,4 +1,5 @@
 package br.com.gamestore.loja_api.services;
+
 import br.com.gamestore.loja_api.model.*;
 import br.com.gamestore.loja_api.repositories.ItemDoCarrinhoRepository;
 import br.com.gamestore.loja_api.repositories.ItemPedidoRepository;
@@ -9,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import br.com.gamestore.loja_api.repositories.CarrinhoRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,10 +28,10 @@ public class PedidoService {
     private UsuarioRepository usuarioRepository;
 
     @Autowired
-    private ItemDoCarrinhoRepository itemDoCarrinhoRepository;
+    private CarrinhoRepository carrinhoRepository;
 
     @Transactional
-    public Pedido finalizarCompra(String loginUsuario){
+    public Pedido finalizarCompra(String loginUsuario) {
 
         Usuario usuario = (Usuario) usuarioRepository.findByLogin(loginUsuario);
 
@@ -38,7 +41,7 @@ public class PedidoService {
         Set<ItemDoCarrinho> itensDoCarrinhos = carrinho.getItens();
 
         //verifico se o carrinho esta vazio
-        if (itensDoCarrinhos.isEmpty()){
+        if (itensDoCarrinhos.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Seu carrinho esta vazio");
         }
 
@@ -49,12 +52,12 @@ public class PedidoService {
 
 
         //Esse metodo cria o recido
-        Pedido novoPedido = new Pedido(usuario, LocalDate.now(),total);
+        Pedido novoPedido = new Pedido(usuario, LocalDate.now(), total);
 
         //Aqui eu copio os itens do carrinho para o recibo
         Set<ItemPedido> itensDoPedido = new HashSet<>();
 
-        for (ItemDoCarrinho itemDoCarrinho : itensDoCarrinhos){
+        for (ItemDoCarrinho itemDoCarrinho : itensDoCarrinhos) {
             ItemPedido novoItemPedido = new ItemPedido(
                     novoPedido,
                     itemDoCarrinho.getJogo(),
@@ -64,17 +67,19 @@ public class PedidoService {
             itensDoPedido.add(novoItemPedido);
         }
 
-        //Aquyi eu amarro a lista de itens ao pedido
+        //Aqui eu amarro a lista de itens ao pedido
         novoPedido.setItens(itensDoPedido);
 
         //Aqui eu estou salvando o pedido
         Pedido pedidoSalvo = pedidoRepository.save(novoPedido);
 
-        //Aqui eu limpo o carrinho original
-        itemDoCarrinhoRepository.deleteAll(itensDoCarrinhos);
 
-        //Essa parte faz o sistema retornar ao pedido q foi salvo
-        return pedidoSalvo;
+        carrinho.getItens().clear();//Esvazia a coleção
+
+        carrinhoRepository.saveAndFlush(carrinho);//Salva imediatamente as alterações no banco
+
+
+        return pedidoSalvo;//Essa parte faz o sistema retornar ao pedido q foi salvo
 
     }
 }

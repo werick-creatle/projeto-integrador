@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(exclude = {"carrinho", "jogo"})
 public class ItemDoCarrinho {
 
     @Id
@@ -28,10 +28,9 @@ public class ItemDoCarrinho {
 
     private int quantidade;
 
-    public ItemDoCarrinho(Carrinho carrinho, Jogo jogo, int quantidade){
+    public ItemDoCarrinho(Carrinho carrinho, Jogo jogo, int quantidade) {
         this.carrinho = carrinho;
         this.jogo = jogo;
         this.quantidade = quantidade;
     }
-
 }

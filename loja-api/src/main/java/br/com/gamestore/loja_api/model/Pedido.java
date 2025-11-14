@@ -1,13 +1,10 @@
 package br.com.gamestore.loja_api.model;
 
-import br.com.gamestore.loja_api.model.ItemPedido;
-import br.com.gamestore.loja_api.model.Usuario;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -19,7 +16,7 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(exclude = {"usuario", "itens"})
 public class Pedido {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,7 +31,7 @@ public class Pedido {
 
     private BigDecimal valorTotal;
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<ItemPedido> itens = new HashSet<>();
 
     public Pedido(Usuario usuario, LocalDate dataDoPedido, BigDecimal valorTotal) {

@@ -1,7 +1,9 @@
 // Este Controller é responsável por cuidar das rotas de autenticação (Registro e Login).
 
 package br.com.gamestore.loja_api.controllers;
+
 import java.time.LocalDate;
+
 import br.com.gamestore.loja_api.dto.LoginDTO;
 import br.com.gamestore.loja_api.dto.RegistroDTO;
 import br.com.gamestore.loja_api.dto.TokenDTO;
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.AuthenticationException;
 
 @RestController
-@RequestMapping("/login") // Todas as rotas aqui começarão com /login
+@RequestMapping("/api/auth") // Todas as rotas aqui começarão com /login
 //@CrossOrigin("*")
 public class AuthController {
 
