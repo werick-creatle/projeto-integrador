@@ -1,8 +1,6 @@
 package br.com.gamestore.loja_api.services;
 
 import br.com.gamestore.loja_api.model.*;
-import br.com.gamestore.loja_api.repositories.ItemDoCarrinhoRepository;
-import br.com.gamestore.loja_api.repositories.ItemPedidoRepository;
 import br.com.gamestore.loja_api.repositories.PedidoRepository;
 import br.com.gamestore.loja_api.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-
 import br.com.gamestore.loja_api.repositories.CarrinhoRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class PedidoService {
@@ -31,55 +27,76 @@ public class PedidoService {
     private CarrinhoRepository carrinhoRepository;
 
     @Transactional
-    public Pedido finalizarCompra(String loginUsuario) {
+    public Pedido finalizarCompra(String loginUsuario){
 
         Usuario usuario = (Usuario) usuarioRepository.findByLogin(loginUsuario);
-
         Carrinho carrinho = usuario.getCarrinho();
 
         //Buscar o item do carrinho
         Set<ItemDoCarrinho> itensDoCarrinhos = carrinho.getItens();
 
         //verifico se o carrinho esta vazio
-        if (itensDoCarrinhos.isEmpty()) {
+        if (itensDoCarrinhos.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Seu carrinho esta vazio");
         }
 
-        //Esse bloco de codigo calcula o total do carrinho
-        BigDecimal total = itensDoCarrinhos.stream()
-                .map(item -> item.getJogo().getPreco().multiply(BigDecimal.valueOf(item.getQuantidade())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // Começa o total zerado; será calculado DENTRO do loop
+        BigDecimal total = BigDecimal.ZERO;
 
-
-        //Esse metodo cria o recido
-        Pedido novoPedido = new Pedido(usuario, LocalDate.now(), total);
+        //Esse metodo cria o recido (com total nulo por enquanto)
+        Pedido novoPedido = new Pedido(usuario, LocalDate.now(), null);
 
         //Aqui eu copio os itens do carrinho para o recibo
         Set<ItemPedido> itensDoPedido = new HashSet<>();
 
-        for (ItemDoCarrinho itemDoCarrinho : itensDoCarrinhos) {
+        for (ItemDoCarrinho itemDoCarrinho : itensDoCarrinhos){
+
+            // --- LÓGICA DE ESTOQUE ADICIONADA ---
+            Jogo jogo = itemDoCarrinho.getJogo();
+
+            // 1. Verifica se a quantidade no carrinho é maior que o estoque
+            if (jogo.getQuantidadeEstoque() < itemDoCarrinho.getQuantidade()) {
+                // Se falhar, o @Transactional reverte o pedido inteiro
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Estoque esgotado para o item: " + jogo.getNome() +
+                                ". Disponível: " + jogo.getQuantidadeEstoque());
+            }
+
+            // 2. Dá baixa no estoque
+            int novoEstoque = jogo.getQuantidadeEstoque() - itemDoCarrinho.getQuantidade();
+            jogo.setQuantidadeEstoque(novoEstoque);
+            // (O @Transactional vai salvar o 'jogo' automaticamente no fim)
+            // --- FIM DA LÓGICA DE ESTOQUE ---
+
+
             ItemPedido novoItemPedido = new ItemPedido(
                     novoPedido,
-                    itemDoCarrinho.getJogo(),
+                    jogo,
                     itemDoCarrinho.getQuantidade(),
-                    itemDoCarrinho.getJogo().getPreco()// Salva o preço
+                    jogo.getPreco()// Salva o preço
             );
             itensDoPedido.add(novoItemPedido);
+
+            // --- CÁLCULO DO TOTAL (MOVIDO PARA CÁ) ---
+            // Soma o total (agora que o item foi validado)
+            total = total.add(jogo.getPreco().multiply(BigDecimal.valueOf(itemDoCarrinho.getQuantidade())));
+            // --- FIM DA CORREÇÃO ---
         }
 
-        //Aqui eu amarro a lista de itens ao pedido
+        //Aquyi eu amarro a lista de itens ao pedido
         novoPedido.setItens(itensDoPedido);
+
+        // Agora que o loop acabou, define o total calculado
+        novoPedido.setValorTotal(total);
 
         //Aqui eu estou salvando o pedido
         Pedido pedidoSalvo = pedidoRepository.save(novoPedido);
 
-
+        //Aqui eu limpo o carrinho original
         carrinho.getItens().clear();//Esvazia a coleção
-
         carrinhoRepository.saveAndFlush(carrinho);//Salva imediatamente as alterações no banco
 
-
-        return pedidoSalvo;//Essa parte faz o sistema retornar ao pedido q foi salvo
-
+        //Essa parte faz o sistema retornar ao pedido q foi salvo
+        return pedidoSalvo;
     }
 }

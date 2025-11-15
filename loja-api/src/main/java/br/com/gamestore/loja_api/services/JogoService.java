@@ -33,10 +33,16 @@ public class JogoService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Erro: Já existe um jogo cadastrado com este nome.");
         }
 
+        //Conversão DTO em Entidade
         Jogo novoJogo = new Jogo(
-                null, dados.nome(), dados.descricao(), dados.preco(),
-                dados.plataforma(), dados.genero(), dados.urlImagemCapa(),
-                dados.dataLancamento()
+                null, dados.nome(),
+                dados.descricao(),
+                dados.preco(),
+                dados.plataforma(),
+                dados.genero(),
+                dados.urlImagemCapa(),
+                dados.dataLancamento(),
+                dados.quantidadeEstoque()
         );
 
         return jogoRepository.save(novoJogo);

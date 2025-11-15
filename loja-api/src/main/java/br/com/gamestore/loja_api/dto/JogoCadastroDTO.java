@@ -29,5 +29,9 @@ public record JogoCadastroDTO(
         String descricao,
 
         @NotBlank(message = "O campo gênero não pode estar em branco!")
-        String genero
+        String genero,
+
+        @Min(value = 0, message = "O estoque não pode ser negativo")
+        int quantidadeEstoque
+
 ) {}

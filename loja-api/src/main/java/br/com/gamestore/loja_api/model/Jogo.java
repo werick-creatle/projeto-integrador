@@ -26,4 +26,6 @@ public class Jogo {
     private String plataforma;
     private String genero;
     private String urlImagemCapa;
-    private LocalDate dataLancamento; }
+    private LocalDate dataLancamento;
+    private int quantidadeEstoque;
+}

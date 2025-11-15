@@ -7,6 +7,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +37,16 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-
     }
+
+    /**
+     * Trata exceções ResponseStatusException (ex: 400, 404, 403)
+     * que são lançadas manualmente pelos Services.
+     */
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<String> handleResponseStatusException(ResponseStatusException ex) {
+        // Retorna o Status (ex: 400) e a Mensagem (ex: "Estoque insuficiente...")
+        return new ResponseEntity<>(ex.getReason(), ex.getStatusCode());
+    }
+
 }

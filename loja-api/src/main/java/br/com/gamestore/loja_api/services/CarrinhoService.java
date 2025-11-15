@@ -3,6 +3,8 @@ package br.com.gamestore.loja_api.services;
 import br.com.gamestore.loja_api.dto.ItemAtualizarDTO;
 import br.com.gamestore.loja_api.dto.ItemCarrinhoViewDTO;
 import br.com.gamestore.loja_api.dto.CarrinhoViewDTO;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import org.springframework.transaction.annotation.Transactional;
 import br.com.gamestore.loja_api.repositories.UsuarioRepository;
@@ -69,6 +71,11 @@ public class CarrinhoService {
         // Aqui eu busco o jogo pelo ID informado no DTO, garantindo que o jogo realmente existe
         Jogo jogo = jogoService.buscarPorId(dados.jogoId());
 
+        if (jogo.getQuantidadeEstoque() < dados.quantidade()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Estoque insuficiente. Quantidade disponível: " + jogo.getQuantidadeEstoque());
+        }
+
 
         // Aqui eu verifico se o jogo já existe no carrinho do usuário
         // O método 'findByCarrinhoIdAndJogoId' procura um item com o mesmo jogo dentro do mesmo carrinho
@@ -79,6 +86,14 @@ public class CarrinhoService {
         if (optionalItem.isPresent()) {
 
             ItemDoCarrinho itemExistente = optionalItem.get();
+
+            int novaQuantidade = itemExistente.getQuantidade() + dados.quantidade();
+            if (jogo.getQuantidadeEstoque() < novaQuantidade) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Estoque insuficiente. Você já tem: " + itemExistente.getQuantidade() +
+                                "no carrinho. Quantidade disponível: " + jogo.getQuantidadeEstoque());
+            }
+
 
             // Aqui eu somo a nova quantidade à que já estava no carrinho
             itemExistente.setQuantidade(itemExistente.getQuantidade() + dados.quantidade());
@@ -136,8 +151,18 @@ public class CarrinhoService {
         }
         //Essa verificação garante q o itemId q eu vou alualizar pertence ao carrinho do usuario
         if (!itemParaAtualizar.getCarrinho().getId().equals(carrinho.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para alterar esse item");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Você não tem permissão para alterar esse item");
         }
+
+        Jogo jogo = itemParaAtualizar.getJogo();
+        if (jogo.getQuantidadeEstoque() < dados.quantidade()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Estoque insuficiente. Quantidade disponível: " +
+                            jogo.getQuantidadeEstoque());
+        }
+
+
         //Aqui estou atualizando os itens do repositorio do carrinho
         itemParaAtualizar.setQuantidade(dados.quantidade());
         itemDoCarrinhoRepository.save(itemParaAtualizar);
