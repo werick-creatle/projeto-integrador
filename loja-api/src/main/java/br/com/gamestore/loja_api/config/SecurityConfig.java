@@ -48,7 +48,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
 
-                        .requestMatchers("/h2-console/**").permitAll() // 1. LIBERA O CONSOLE H2
+                        //.requestMatchers("/h2-console/**").permitAll() // 1. LIBERA O CONSOLE H2
                         .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/jogos/**").permitAll()
@@ -62,7 +62,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 
-                .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
+                //.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()))
 
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
