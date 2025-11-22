@@ -133,38 +133,33 @@ public class CarrinhoService {
     }
 
 
-    public void atualizarQuantidadeItem(Long itemId, ItemAtualizarDTO dados, Usuario usuario) {
+    // Mude o retorno do método para o seu DTO
+    public ItemCarrinhoViewDTO atualizarQuantidadeItem(Long itemId, ItemAtualizarDTO dados, Usuario usuario) {
         Carrinho carrinho = usuario.getCarrinho();
 
-        //Aqui estou buscando o item pelo Id
-        Optional<ItemDoCarrinho> optionalItem = itemDoCarrinhoRepository.findById(itemId);
+        // Busca o item (usando a forma simplificada)
+        ItemDoCarrinho itemParaAtualizar = itemDoCarrinhoRepository.findById(itemId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item não encontrado"));
 
-
-        ItemDoCarrinho itemParaAtualizar;
-
-        if (optionalItem.isPresent()) {
-
-            //Aqui estou atualizando o item
-            itemParaAtualizar = optionalItem.get();
-        } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item não encontrado");
-        }
-        //Essa verificação garante q o itemId q eu vou alualizar pertence ao carrinho do usuario
+        // Verifica se o item é do usuário mesmo
         if (!itemParaAtualizar.getCarrinho().getId().equals(carrinho.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Você não tem permissão para alterar esse item");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para alterar esse item");
         }
 
         Jogo jogo = itemParaAtualizar.getJogo();
         if (jogo.getQuantidadeEstoque() < dados.quantidade()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Estoque insuficiente. Quantidade disponível: " +
-                            jogo.getQuantidadeEstoque());
+                    "Estoque insuficiente. Quantidade disponível: " + jogo.getQuantidadeEstoque());
         }
 
-
-        //Aqui estou atualizando os itens do repositorio do carrinho
+        // Atualiza a quantidade
         itemParaAtualizar.setQuantidade(dados.quantidade());
-        itemDoCarrinhoRepository.save(itemParaAtualizar);
+
+        // Salva e captura o objeto salvo atualizado
+        ItemDoCarrinho itemSalvo = itemDoCarrinhoRepository.save(itemParaAtualizar);
+
+        // AQUI A MÁGICA: Retorna o DTO.
+        // O construtor do DTO vai recalcular o subtotal com a nova quantidade.
+        return new ItemCarrinhoViewDTO(itemSalvo);
     }
 }

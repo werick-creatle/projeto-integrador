@@ -1,6 +1,7 @@
 package br.com.gamestore.loja_api.controllers;
 
 import br.com.gamestore.loja_api.dto.CarrinhoViewDTO;
+import br.com.gamestore.loja_api.dto.ItemCarrinhoViewDTO;
 import org.springframework.security.core.Authentication;
 import br.com.gamestore.loja_api.dto.ItemAdicionarDTO;
 import br.com.gamestore.loja_api.model.Usuario;
@@ -17,19 +18,24 @@ import br.com.gamestore.loja_api.dto.ItemAtualizarDTO;
 @RestController
 @RequestMapping("/api/carrinho")
 //@CrossOrigin("*")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class CarrinhoController {
 
     @Autowired
     CarrinhoService carrinhoService;
 
     @PutMapping("/atualizar/{itemId}")
-    public ResponseEntity<?> atualizarQuantidade(@PathVariable Long itemId, @Valid @RequestBody ItemAtualizarDTO dados, Authentication authentication){ //Essa anotação @PathVariable pega um valor q veio dentro de uma URL e joga dentro do metodo como uma variavel
+    public ResponseEntity<?> atualizarQuantidade(@PathVariable Long itemId, @Valid @RequestBody ItemAtualizarDTO dados, Authentication authentication) {
         try {
             Usuario usuarioLogado = (Usuario) authentication.getPrincipal();
-            carrinhoService.atualizarQuantidadeItem(itemId,dados ,usuarioLogado);
 
-            return ResponseEntity.ok().build();
-        }catch (ResponseStatusException e){
+            // 1. Chama o serviço e guarda o DTO atualizado na variável
+            ItemCarrinhoViewDTO itemAtualizado = carrinhoService.atualizarQuantidadeItem(itemId, dados, usuarioLogado);
+
+            // 2. Retorna 200 OK com o JSON do item atualizado
+            return ResponseEntity.ok(itemAtualizado);
+
+        } catch (ResponseStatusException e) {
             return ResponseEntity.status(e.getStatusCode()).body(e.getReason());
         }
     }

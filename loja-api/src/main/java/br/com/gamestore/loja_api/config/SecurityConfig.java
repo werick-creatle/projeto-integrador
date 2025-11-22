@@ -55,9 +55,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/jogos").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/jogos/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/jogos/**").hasRole("ADMIN")
-                        .requestMatchers("/api/carrinho/**").hasRole("USER")
-                        .requestMatchers("/api/pedidos/**").hasRole("USER")
-                        .requestMatchers("/api/usuarios/**").hasRole("USER")
+
+                        // [CORREÇÃO]: Mudei de hasRole("USER") para authenticated().
+                        // Motivo: Como estamos testando com o usuário ADMIN, se deixarmos só USER,
+                        // o Admin toma erro 403 ao tentar comprar. authenticated() libera para ambos.
+                        .requestMatchers("/api/carrinho/**").authenticated()
+                        .requestMatchers("/api/pedidos/**").authenticated()
+                        .requestMatchers("/api/usuarios/**").authenticated()
 
                         .anyRequest().authenticated()
                 )
@@ -78,12 +82,18 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Permite requisições de qualquer origem
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+
+        // Motivo: O navegador PROÍBE usar "*" quando allowCredentials é true.
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
+
         // Permite os métodos (GET, POST, PUT, DELETE)
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
         // Permite todos os headers (incluindo "Authorization" para o token)
         configuration.setAllowedHeaders(Arrays.asList("*"));
+
+        // [ADICIONADO]: Permite Cookies/Sessão
+        // Motivo: Essencial para o login persistir entre as requisições
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         // Aplica esta configuração a TODAS as rotas ("/**")

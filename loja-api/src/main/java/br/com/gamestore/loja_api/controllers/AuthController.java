@@ -26,6 +26,7 @@ import org.springframework.security.core.AuthenticationException;
 @RestController
 @RequestMapping("/api/auth") // Todas as rotas aqui começarão com /login
 //@CrossOrigin("*")
+@CrossOrigin(origins = "http://localhost:4200", allowCredentials = "true")
 public class AuthController {
 
     @Autowired
