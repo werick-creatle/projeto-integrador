@@ -1,14 +1,15 @@
 package br.com.gamestore.loja_api.services;
 
+import br.com.gamestore.loja_api.dto.PedidoViewDTO;
 import br.com.gamestore.loja_api.model.*;
 import br.com.gamestore.loja_api.repositories.PedidoRepository;
 import br.com.gamestore.loja_api.repositories.UsuarioRepository;
+import br.com.gamestore.loja_api.repositories.CarrinhoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import br.com.gamestore.loja_api.repositories.CarrinhoRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ import java.util.Set;
 
 @Service
 public class PedidoService {
+
     @Autowired
     private PedidoRepository pedidoRepository;
 
@@ -26,6 +28,14 @@ public class PedidoService {
     @Autowired
     private CarrinhoRepository carrinhoRepository;
 
+    // --- NOVO MÉTODO (O QUE FALTAVA PARA O GET FUNCIONAR) ---
+    public PedidoViewDTO buscarPorId(Long id) {
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido não encontrado"));
+        return new PedidoViewDTO(pedido);
+    }
+
+    // --- SEU MÉTODO DE FINALIZAR COMPRA (MANTIDO IGUAL) ---
     @Transactional
     public Pedido finalizarCompra(String loginUsuario){
 
@@ -51,12 +61,11 @@ public class PedidoService {
 
         for (ItemDoCarrinho itemDoCarrinho : itensDoCarrinhos){
 
-            // --- LÓGICA DE ESTOQUE ADICIONADA ---
+            // --- LÓGICA DE ESTOQUE ---
             Jogo jogo = itemDoCarrinho.getJogo();
 
             // 1. Verifica se a quantidade no carrinho é maior que o estoque
             if (jogo.getQuantidadeEstoque() < itemDoCarrinho.getQuantidade()) {
-                // Se falhar, o @Transactional reverte o pedido inteiro
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "Estoque esgotado para o item: " + jogo.getNome() +
                                 ". Disponível: " + jogo.getQuantidadeEstoque());
@@ -65,9 +74,7 @@ public class PedidoService {
             // 2. Dá baixa no estoque
             int novoEstoque = jogo.getQuantidadeEstoque() - itemDoCarrinho.getQuantidade();
             jogo.setQuantidadeEstoque(novoEstoque);
-            // (O @Transactional vai salvar o 'jogo' automaticamente no fim)
             // --- FIM DA LÓGICA DE ESTOQUE ---
-
 
             ItemPedido novoItemPedido = new ItemPedido(
                     novoPedido,
@@ -77,10 +84,8 @@ public class PedidoService {
             );
             itensDoPedido.add(novoItemPedido);
 
-            // --- CÁLCULO DO TOTAL (MOVIDO PARA CÁ) ---
-            // Soma o total (agora que o item foi validado)
+            // Soma o total
             total = total.add(jogo.getPreco().multiply(BigDecimal.valueOf(itemDoCarrinho.getQuantidade())));
-            // --- FIM DA CORREÇÃO ---
         }
 
         //Aquyi eu amarro a lista de itens ao pedido

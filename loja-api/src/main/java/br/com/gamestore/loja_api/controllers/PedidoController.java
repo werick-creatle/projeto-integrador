@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +22,14 @@ public class PedidoController {
 
     @Autowired
     private PedidoService pedidoService;
+
+    // --- NOVO: Método para buscar o pedido pelo ID
+    @GetMapping("/{id}")
+    public ResponseEntity<PedidoViewDTO> buscarPorId(@PathVariable Long id) {
+        // Chama o service (lembre-se de ter criado o metodo buscarPorId lá no Service também)
+        PedidoViewDTO pedido = pedidoService.buscarPorId(id);
+        return ResponseEntity.ok(pedido);
+    }
 
     //EndPoint para finalizar compra (chekout)
     @PostMapping("/finalizar")
@@ -36,6 +47,5 @@ public class PedidoController {
                     .status(e.getStatusCode())
                     .body(e.getReason());
         }
-
     }
 }
